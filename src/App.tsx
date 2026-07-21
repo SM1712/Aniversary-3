@@ -8,6 +8,7 @@ import { InteractiveMovie } from './components/InteractiveMovie';
 import { MemoryGallery } from './components/MemoryGallery';
 import { LoveLetterModal } from './components/LoveLetterModal';
 import { ReasonGenerator } from './components/ReasonGenerator';
+import { WallpaperGenerator } from './components/WallpaperGenerator';
 import { AudioPlayer } from './components/AudioPlayer';
 import { FloralDivider } from './components/FloralDecorations';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,7 +18,7 @@ export const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'movie' | 'gallery'>('movie');
 
   return (
-    <div className="relative min-h-screen pb-24 text-ink-900 bg-cream-50 overflow-x-hidden selection:bg-rose-500 selection:text-white">
+    <div className="relative min-h-screen pb-24 text-ink-900 bg-cream-50 overflow-x-hidden selection:bg-rose-500 selection:text-white transition-colors duration-500">
       {/* Soft Petals Overlay */}
       <PetalsCanvas />
 
@@ -34,14 +35,11 @@ export const AppContent: React.FC = () => {
         {/* Minimal Hero Header */}
         <section className="text-center space-y-3">
           <span className="text-xs font-mono uppercase tracking-widest text-ink-500 block">
-            Aniversario
+            21.07.2023 — 2026
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl font-bold text-ink-900 tracking-tight">
-            Nuestros 3 Años Juntos
+            Feliz Aniversario N°3
           </h1>
-          <p className="text-sm text-ink-700 font-light max-w-md mx-auto">
-            21 de Julio de 2023 — 21 de Julio de 2026
-          </p>
 
           <AnniversaryCounter />
         </section>
@@ -72,6 +70,11 @@ export const AppContent: React.FC = () => {
         </section>
 
         <FloralDivider />
+
+        {/* Section: Crea Tu propio Fondo */}
+        <section>
+          <WallpaperGenerator />
+        </section>
 
         {/* Reason Generator */}
         <section>

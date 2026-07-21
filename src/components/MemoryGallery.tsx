@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CHAPTERS, Chapter, MediaItem } from '../data/storyData';
-import { Film, ZoomIn, X } from 'lucide-react';
+import { Film, X } from 'lucide-react';
 
 export const MemoryGallery: React.FC = () => {
   const [selectedChapterId, setSelectedChapterId] = useState<number>(0);
@@ -60,7 +60,7 @@ export const MemoryGallery: React.FC = () => {
               {item.type === 'image' ? (
                 <img
                   src={item.url}
-                  alt={item.title}
+                  alt={item.date}
                   loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -74,8 +74,7 @@ export const MemoryGallery: React.FC = () => {
               )}
 
               <div className="absolute inset-0 bg-ink-900/40 opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end text-white">
-                <span className="text-[10px] font-mono opacity-80 block">{item.date}</span>
-                <h4 className="text-xs font-serif font-semibold truncate">{item.title}</h4>
+                <span className="text-[10px] font-mono opacity-90 block">{item.date}</span>
               </div>
             </motion.div>
           ))}
@@ -103,11 +102,11 @@ export const MemoryGallery: React.FC = () => {
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="max-h-[65vh] w-full flex items-center justify-center bg-stone-950 rounded-xl overflow-hidden mb-4">
+              <div className="max-h-[65vh] w-full flex items-center justify-center bg-stone-950 rounded-xl overflow-hidden mb-3">
                 {activeMedia.type === 'image' ? (
                   <img
                     src={activeMedia.url}
-                    alt={activeMedia.title}
+                    alt={activeMedia.date}
                     className="max-w-full max-h-[65vh] object-contain"
                   />
                 ) : (
@@ -120,20 +119,10 @@ export const MemoryGallery: React.FC = () => {
                 )}
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-serif text-lg font-bold text-ink-900">
-                    {activeMedia.title}
-                  </h3>
-                  <span className="text-xs text-ink-500 font-mono">
-                    {activeMedia.date}
-                  </span>
-                </div>
-                {activeMedia.caption && (
-                  <p className="text-xs text-ink-700 font-light">
-                    {activeMedia.caption}
-                  </p>
-                )}
+              <div className="text-center">
+                <span className="text-xs text-ink-600 font-mono">
+                  {activeMedia.date}
+                </span>
               </div>
             </div>
           </motion.div>

@@ -121,20 +121,20 @@ export const InteractiveMovie: React.FC<InteractiveMovieProps> = ({ onFinishJour
       </div>
 
       {/* Media Viewport */}
-      <div className="relative w-full h-[420px] sm:h-[500px] bg-stone-900 flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[420px] sm:h-[500px] bg-stone-950 flex items-center justify-center overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentItem.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="relative w-full h-full flex items-center justify-center bg-stone-950"
+            transition={{ duration: 0.3 }}
+            className="relative w-full h-full flex items-center justify-center"
           >
             {currentItem.type === 'image' ? (
               <img
                 src={currentItem.url}
-                alt={currentItem.title}
+                alt={currentItem.date}
                 className="max-w-full max-h-full object-contain select-none"
               />
             ) : (
@@ -147,22 +147,10 @@ export const InteractiveMovie: React.FC<InteractiveMovieProps> = ({ onFinishJour
               />
             )}
 
-            {/* Subtle Title and Date Banner */}
-            <div className="absolute bottom-4 inset-x-4 z-20 pointer-events-none">
-              <div className="bg-stone-900/80 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 text-white max-w-lg mx-auto text-center shadow-lg">
-                <div className="flex items-center justify-center gap-2 mb-0.5">
-                  <span className="font-serif font-semibold text-sm sm:text-base text-stone-100">
-                    {currentItem.title}
-                  </span>
-                  <span className="text-[10px] text-stone-400 font-mono">
-                    • {currentItem.date}
-                  </span>
-                </div>
-                {currentItem.caption && (
-                  <p className="text-xs text-stone-300 font-light">
-                    {currentItem.caption}
-                  </p>
-                )}
+            {/* Clean Date Badge Only */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+              <div className="bg-black/60 backdrop-blur-md px-3.5 py-1 rounded-full border border-white/10 text-white text-xs font-mono tracking-wide shadow-md">
+                {currentItem.date}
               </div>
             </div>
           </motion.div>
