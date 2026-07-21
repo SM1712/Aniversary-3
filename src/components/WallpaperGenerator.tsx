@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CHAPTERS, MediaItem } from '../data/storyData';
-import { Shuffle, Sparkles, Check, Smartphone, Monitor, Heart, Layers } from 'lucide-react';
+import { Shuffle, Sparkles, Check, Smartphone, Monitor, Heart } from 'lucide-react';
 
 export type ShapeMode = 'number3' | 'heart' | 'polaroid' | 'grid';
 export type DeviceFormat = 'mobile' | 'desktop';
@@ -27,22 +27,17 @@ export const WallpaperGenerator: React.FC = () => {
     setTimeout(() => setApplied(false), 2000);
   };
 
-  // Grid coordinates defining a true Number "3" shape (5 columns x 6 rows)
+  // Grid coordinates defining a true Number "3" shape
   const number3Grid = [
-    // Top bar of 3
     { r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 2 }, { r: 0, c: 3 },
-    // Top right drop
     { r: 1, c: 3 },
-    // Middle bar of 3
     { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 },
-    // Bottom right drop
     { r: 3, c: 3 },
     { r: 4, c: 3 },
-    // Bottom bar of 3
     { r: 5, c: 0 }, { r: 5, c: 1 }, { r: 5, c: 2 }, { r: 5, c: 3 },
   ];
 
-  // Grid coordinates defining a Heart shape (5 columns x 6 rows)
+  // Grid coordinates defining a Heart shape
   const heartGrid = [
     { r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 3 }, { r: 0, c: 4 },
     { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 },
@@ -98,7 +93,6 @@ export const WallpaperGenerator: React.FC = () => {
               : 'w-full aspect-[16/9]'
           }`}
         >
-          {/* Ambient Background Gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-stone-900 to-stone-950 opacity-95" />
 
           {/* REAL NUMBER 3 SHAPE MATRIX */}
@@ -200,16 +194,14 @@ export const WallpaperGenerator: React.FC = () => {
             </div>
           )}
 
-          {/* Minimal Integrated Badge Overlay */}
-          <div className="relative z-20 text-center pt-2">
-            <div className="inline-block bg-black/70 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-white shadow-xl">
-              <span className="font-serif font-semibold text-xs sm:text-sm tracking-wide block">
-                Feliz Aniversario N°3
-              </span>
-              <span className="text-[10px] text-stone-300 font-mono block">
-                21 de Julio de 2023 — 2026
-              </span>
-            </div>
+          {/* PURE FLOATING TYPOGRAPHY (No box, no capsule, no borders) */}
+          <div className="relative z-20 text-center pt-2 pointer-events-none drop-shadow-lg">
+            <h3 className="font-serif font-semibold text-sm sm:text-base text-white tracking-wide block">
+              Feliz Aniversario N°3
+            </h3>
+            <p className="text-[10px] text-stone-300 font-mono block mt-0.5">
+              21 de Julio de 2023 — 2026
+            </p>
           </div>
         </div>
 
