@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LOVE_REASONS } from '../data/storyData';
-import { Heart, Sparkles, RefreshCw } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { RefreshCw } from 'lucide-react';
 
 export const ReasonGenerator: React.FC = () => {
   const [index, setIndex] = useState<number>(0);
@@ -12,32 +11,24 @@ export const ReasonGenerator: React.FC = () => {
     const nextIdx = (index + 1) % LOVE_REASONS.length;
     setIndex(nextIdx);
     setKey(prev => prev + 1);
-
-    confetti({
-      particleCount: 20,
-      spread: 40,
-      origin: { y: 0.8 },
-      colors: ['#fda4af', '#fde047', '#f43f5e'],
-    });
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-8">
-      <div className="glass-panel rounded-3xl p-6 sm:p-8 text-center border-rose-500/30 shadow-xl relative overflow-hidden">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-900/60 border border-rose-500/30 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-4">
-          <Sparkles className="w-3.5 h-3.5" />
-          Razones por las que te amo
-        </div>
+    <div className="w-full max-w-xl mx-auto py-4">
+      <div className="bg-white rounded-2xl p-6 text-center border border-ink-900/10 shadow-sm">
+        <span className="text-[10px] uppercase font-mono tracking-widest text-ink-500 block mb-3">
+          Razones
+        </span>
 
-        <div className="min-h-[90px] flex items-center justify-center mb-6">
+        <div className="min-h-[60px] flex items-center justify-center mb-4">
           <AnimatePresence mode="wait">
             <motion.p
               key={key}
-              initial={{ opacity: 0, y: 15, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -15, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-              className="font-serif text-lg sm:text-2xl text-amber-100 italic font-medium leading-relaxed"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="font-serif text-base sm:text-lg text-ink-900 italic font-medium"
             >
               "{LOVE_REASONS[index]}"
             </motion.p>
@@ -46,11 +37,10 @@ export const ReasonGenerator: React.FC = () => {
 
         <button
           onClick={handleNextReason}
-          className="px-6 py-3 rounded-full bg-rose-900/80 hover:bg-rose-800 text-amber-200 font-semibold text-xs sm:text-sm border border-amber-300/40 flex items-center justify-center gap-2 mx-auto transition-all shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+          className="px-4 py-2 rounded-full bg-cream-100 hover:bg-cream-200 text-ink-900 font-medium text-xs border border-ink-900/10 flex items-center justify-center gap-2 mx-auto transition-colors cursor-pointer"
         >
-          <RefreshCw className="w-4 h-4 text-amber-300" />
-          <span>Siguiente Razón de Amor (#{index + 1})</span>
-          <Heart className="w-4 h-4 text-rose-400 fill-rose-400" />
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span>Siguiente Razón ({index + 1}/{LOVE_REASONS.length})</span>
         </button>
       </div>
     </div>

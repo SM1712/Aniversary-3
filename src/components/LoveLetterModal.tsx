@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Heart, Sparkles, X, Music, Gift, Flower2 } from 'lucide-react';
+import { X, Music } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAudio } from '../context/AudioContext';
 import { SONGS } from '../data/storyData';
@@ -11,52 +11,35 @@ export const LoveLetterModal: React.FC = () => {
 
   const handleOpen = () => {
     setIsOpen(true);
-    // Play requested finale song "La que me gusta a mi"
     playSong(SONGS[4], true);
 
-    // Trigger romantic confetti burst
     confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#f43f5e', '#fde047', '#fda4af', '#be123c'],
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#e11d48', '#d97706', '#292524'],
     });
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8 text-center">
-      {/* Interactive Wax Envelope Banner */}
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        className="glass-panel rounded-3xl p-8 border border-amber-300/40 shadow-2xl relative overflow-hidden text-center"
-      >
-        <div className="absolute top-0 right-0 p-4 opacity-20 text-6xl">
-          🌹
-        </div>
-
-        <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-rose-700 to-amber-500 border border-amber-300/50 flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
-          <Mail className="w-8 h-8 text-rose-950" />
-        </div>
-
-        <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-2">
-          Una Carta Especial para <span className="gold-gradient-text">Ti</span>
+    <div className="w-full max-w-2xl mx-auto py-6 text-center">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-ink-900/10 shadow-sm text-center">
+        <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink-900 mb-2">
+          Un mensaje final
         </h3>
 
-        <p className="text-sm text-rose-200/90 max-w-md mx-auto mb-6 font-light">
-          Tengo algo muy especial que decirte sobre estos 3 años juntos...
+        <p className="text-xs sm:text-sm text-ink-700 max-w-md mx-auto mb-5 font-light">
+          Para cerrar este recorrido de 3 años...
         </p>
 
         <button
           onClick={handleOpen}
-          className="px-8 py-3.5 rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-rose-950 font-bold text-base shadow-xl hover:shadow-rose-600/40 flex items-center justify-center gap-2.5 mx-auto transition-all cursor-pointer border border-amber-200/60"
+          className="px-6 py-3 rounded-full bg-ink-900 hover:bg-ink-800 text-white font-medium text-xs sm:text-sm shadow-md transition-all cursor-pointer"
         >
-          <Gift className="w-5 h-5 text-rose-950" />
-          <span>Abrir Carta de Aniversario</span>
-          <Sparkles className="w-4 h-4 text-rose-950" />
+          Abrir Mensaje de Aniversario
         </button>
-      </motion.div>
+      </div>
 
-      {/* Letter Modal */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -64,68 +47,56 @@ export const LoveLetterModal: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 z-50 bg-burgundy-950/95 backdrop-blur-2xl p-4 sm:p-8 flex items-center justify-center overflow-y-auto"
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md p-4 sm:p-8 flex items-center justify-center overflow-y-auto"
           >
             <motion.div
-              initial={{ scale: 0.8, y: 30 }}
+              initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.8, y: 30 }}
+              exit={{ scale: 0.9, y: 20 }}
               onClick={e => e.stopPropagation()}
-              className="relative max-w-2xl w-full bg-gradient-to-b from-[#2b0712] to-[#180309] rounded-3xl p-6 sm:p-10 border border-amber-300/50 shadow-2xl overflow-hidden text-left"
+              className="relative max-w-xl w-full bg-white rounded-2xl p-6 sm:p-8 border border-ink-900/10 shadow-2xl text-left"
             >
-              {/* Close Button */}
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-rose-950/80 text-rose-200 hover:text-white border border-rose-500/40 flex items-center justify-center z-10"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-cream-100 text-ink-900 flex items-center justify-center"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
-              {/* Music Banner */}
-              <div className="flex items-center gap-2 text-xs text-amber-300 font-mono mb-4 bg-rose-950/80 p-2.5 rounded-xl border border-rose-500/30">
-                <Music className="w-4 h-4 animate-spin-slow text-amber-300" />
+              <div className="flex items-center gap-2 text-xs text-rose-600 font-mono mb-4 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
+                <Music className="w-3.5 h-3.5 animate-pulse" />
                 <span>Sonando ahora: <strong>La que me gusta a mí</strong> — Los Amigos Invisibles</span>
               </div>
 
-              {/* Letter Header */}
-              <div className="text-center mb-6">
-                <span className="text-4xl">🌹</span>
-                <h2 className="font-serif text-3xl sm:text-4xl font-bold gold-gradient-text mt-2">
+              <div className="mb-6">
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-ink-900">
                   Feliz 3er Aniversario
                 </h2>
-                <p className="font-cursive text-xl text-rose-300">
+                <p className="text-xs text-ink-500 font-mono">
                   21 de Julio de 2023 — 21 de Julio de 2026
                 </p>
               </div>
 
-              {/* Letter Body */}
-              <div className="space-y-4 text-rose-100/90 text-sm sm:text-base leading-relaxed font-light">
+              <div className="space-y-3.5 text-ink-800 text-sm leading-relaxed font-light">
                 <p>
-                  <strong className="text-amber-200 font-serif text-lg">Mi vida hermosa,</strong>
+                  Hoy cumplimos 3 años juntos. Mirar atrás y recorrer estas fotos me hace recordar lo afortunado que soy por tenerte en mi vida.
                 </p>
                 <p>
-                  Hoy llegamos a nuestro tercer aniversario juntos. Mirar atrás y recorrer cada foto, cada sonrisa guardada y cada video de nosotros me hace darme cuenta de lo verdaderamente afortunado que soy por tenerte en mi vida.
+                  Desde el 21 de julio de 2023 hemos compartido momentos inolvidables, risas y la tranquilidad de saber que estamos juntos en esto.
+                </p>
+                <p className="font-serif italic text-ink-900 text-base border-l-2 border-rose-500 pl-3 py-0.5">
+                  "Como dice la canción que suena justo ahora: no importa el tiempo que pase, tú sigues siendo la que me gusta a mí."
                 </p>
                 <p>
-                  Desde aquel 21 de julio de 2023, mi mundo tomó un color diferente. Hemos cambiado, hemos crecido, hemos aprendido el uno del otro y hemos superado cualquier momento tomados de la mano.
-                </p>
-                <p>
-                  Gracias por ser mi refugio en los días difíciles, por tu risa que ilumina todo, por tus abrazos sinceros y por amar cada parte de mí.
-                </p>
-                <p className="font-serif italic text-amber-200 text-base sm:text-lg border-l-2 border-amber-400 pl-4 py-1">
-                  "Como dice la canción que suena en este momento... no importa cuánto tiempo pase ni qué depare el camino, tú sigues siendo y siempre serás la que me gusta a mí."
-                </p>
-                <p>
-                  Te amo con todo mi corazón y prometo seguir haciendo de tus días un lugar lleno de amor, sonrisas y complicidad.
+                  Te amo muchísimo. ¡Feliz aniversario!
                 </p>
               </div>
 
-              {/* Signature */}
-              <div className="mt-8 pt-4 border-t border-rose-500/20 text-right">
-                <p className="font-cursive text-2xl text-amber-300">
-                  Con todo mi amor para siempre 💖
+              <div className="mt-6 pt-4 border-t border-ink-900/10 text-right">
+                <p className="font-cursive text-xl text-ink-900">
+                  Con todo mi amor 💖
                 </p>
-                <p className="text-xs text-rose-300/70 font-mono mt-1">
+                <p className="text-[10px] text-ink-500 font-mono mt-0.5">
                   21 de Julio, 2026
                 </p>
               </div>

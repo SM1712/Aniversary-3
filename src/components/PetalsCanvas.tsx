@@ -34,34 +34,30 @@ export const PetalsCanvas: React.FC = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Color palette for romantic rose petals
+    // Subtle light mode petal colors
     const petalColors = [
-      '#f43f5e', // Vibrant Rose
-      '#fb7185', // Soft Pink
-      '#fda4af', // Light Pink
-      '#be123c', // Deep Rose Red
-      '#eab308', // Gold sparkle
+      '#F43F5E', // Warm Rose
+      '#FB7185', // Soft Blush
+      '#FDA4AF', // Light Peach Pink
     ];
 
-    // Create initial petals pool
-    const petalCount = window.innerWidth < 768 ? 35 : 65;
+    const petalCount = window.innerWidth < 768 ? 15 : 25; // Low density, super subtle
     const petals: Petal[] = [];
 
     for (let i = 0; i < petalCount; i++) {
       petals.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 8 + 6,
-        speedY: Math.random() * 1.2 + 0.5,
-        speedX: Math.random() * 1 - 0.5,
+        size: Math.random() * 6 + 4,
+        speedY: Math.random() * 0.8 + 0.3,
+        speedX: Math.random() * 0.6 - 0.3,
         rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.03,
-        opacity: Math.random() * 0.7 + 0.3,
+        rotationSpeed: (Math.random() - 0.5) * 0.02,
+        opacity: Math.random() * 0.25 + 0.1, // Soft transparent opacity
         color: petalColors[Math.floor(Math.random() * petalColors.length)],
       });
     }
 
-    // Draw single petal path
     const drawPetal = (
       ctx: CanvasRenderingContext2D,
       x: number,
@@ -78,59 +74,22 @@ export const PetalsCanvas: React.FC = () => {
       ctx.fillStyle = color;
 
       ctx.beginPath();
-      // Draw organic petal shape
       ctx.moveTo(0, 0);
       ctx.bezierCurveTo(-size / 2, -size / 2, -size, size / 3, 0, size);
       ctx.bezierCurveTo(size, size / 3, size / 2, -size / 2, 0, 0);
       ctx.fill();
 
-      // Subtle gold highlight
-      if (color !== '#eab308') {
-        ctx.strokeStyle = 'rgba(253, 224, 71, 0.25)';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-      }
-
       ctx.restore();
     };
 
-    // Burst of petals on click/tap
-    const handleClick = (e: MouseEvent | TouchEvent) => {
-      const clickX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clickY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-
-      for (let i = 0; i < 15; i++) {
-        petals.push({
-          x: clickX,
-          y: clickY,
-          size: Math.random() * 10 + 6,
-          speedY: (Math.random() - 0.5) * 4,
-          speedX: (Math.random() - 0.5) * 4,
-          rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.08,
-          opacity: 1,
-          color: petalColors[Math.floor(Math.random() * petalColors.length)],
-        });
-      }
-
-      // Keep max pool size under 120
-      if (petals.length > 120) {
-        petals.splice(0, petals.length - 120);
-      }
-    };
-
-    window.addEventListener('click', handleClick);
-
-    // Animation Loop
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      petals.forEach((p, index) => {
+      petals.forEach((p) => {
         p.y += p.speedY;
-        p.x += Math.sin(p.y * 0.01) * 0.8 + p.speedX;
+        p.x += Math.sin(p.y * 0.008) * 0.5 + p.speedX;
         p.rotation += p.rotationSpeed;
 
-        // Reset when falling out of bounds
         if (p.y > height + 20) {
           p.y = -20;
           p.x = Math.random() * width;
@@ -148,7 +107,6 @@ export const PetalsCanvas: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('click', handleClick);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -156,7 +114,7 @@ export const PetalsCanvas: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-10 opacity-80"
+      className="fixed inset-0 pointer-events-none z-10 opacity-70"
     />
   );
 };

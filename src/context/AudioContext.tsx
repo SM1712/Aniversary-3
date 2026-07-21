@@ -23,15 +23,15 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentSong, setCurrentSong] = useState<SongTrack | null>(SONGS[1]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [volume, setVolumeState] = useState<number>(0.8);
+  const [volume, setVolumeState] = useState<number>(0.85);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [hasStarted, setHasStarted] = useState<boolean>(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isTransitioningRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // Create persistent HTML5 Audio element
     const audio = new Audio();
     audio.loop = true;
     audio.volume = volume;
@@ -42,74 +42,118 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setDuration(audio.duration || 0);
     };
 
-    const handleEnded = () => {
-      // Loop or play next
-    };
-
     audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
 
     return () => {
       audio.pause();
       audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
     };
   }, []);
 
-  // Update volume
+  // Sync volume unless muting
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && !isTransitioningRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume;
     }
   }, [volume, isMuted]);
 
+  // Fade Out helper
+  const fadeOut = (durationMs: number = 1000): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!audioRef.current || audioRef.current.paused) {
+        resolve();
+        return;
+      }
+      isTransitioningRef.current = true;
+      const audio = audioRef.current;
+      const initialVol = audio.volume;
+      const steps = 20;
+      const stepTime = durationMs / steps;
+      let step = 0;
+
+      const timer = setInterval(() => {
+        step++;
+        const newVol = Math.max(0, initialVol * (1 - step / steps));
+        audio.volume = newVol;
+
+        if (step >= steps) {
+          clearInterval(timer);
+          audio.pause();
+          resolve();
+        }
+      }, stepTime);
+    });
+  };
+
+  // Fade In helper
+  const fadeIn = (targetVol: number, durationMs: number = 1200): void => {
+    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    audio.volume = 0;
+    audio.play().then(() => {
+      setIsPlaying(true);
+      const steps = 20;
+      const stepTime = durationMs / steps;
+      let step = 0;
+
+      const timer = setInterval(() => {
+        step++;
+        const newVol = Math.min(targetVol, targetVol * (step / steps));
+        audio.volume = isMuted ? 0 : newVol;
+
+        if (step >= steps) {
+          clearInterval(timer);
+          isTransitioningRef.current = false;
+        }
+      }, stepTime);
+    }).catch(err => {
+      console.log('Fade in playback error:', err);
+      isTransitioningRef.current = false;
+    });
+  };
+
   const startAudioExperience = () => {
     setHasStarted(true);
     if (audioRef.current && currentSong) {
-      if (audioRef.current.src !== window.location.origin + currentSong.src) {
-        audioRef.current.src = currentSong.src;
-        if (currentSong.startTime) {
-          audioRef.current.currentTime = currentSong.startTime;
-        }
+      audioRef.current.src = currentSong.src;
+      if (currentSong.startTime) {
+        audioRef.current.currentTime = currentSong.startTime;
       }
-      audioRef.current.play()
-        .then(() => setIsPlaying(true))
-        .catch(err => console.log('Audio playback prevented:', err));
+      fadeIn(volume, 1500);
     }
   };
 
-  const playSong = (song: SongTrack, forcePlay: boolean = true) => {
+  const playSong = async (song: SongTrack, forcePlay: boolean = false) => {
     if (!audioRef.current) return;
 
+    // Don't restart if already playing the exact same track
     if (currentSong?.id === song.id && isPlaying && !forcePlay) {
       return;
     }
 
-    setCurrentSong(song);
+    // Fade out current song smoothly
+    await fadeOut(1000);
 
-    // Fade out slightly before switching
-    const audio = audioRef.current;
-    audio.src = song.src;
+    setCurrentSong(song);
+    audioRef.current.src = song.src;
     if (song.startTime) {
-      audio.currentTime = song.startTime;
+      audioRef.current.currentTime = song.startTime;
     }
 
     if (hasStarted || forcePlay) {
-      audio.play()
-        .then(() => setIsPlaying(true))
-        .catch(err => console.log('Autoplay error:', err));
+      fadeIn(volume, 1200);
     }
   };
 
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+      fadeOut(600).then(() => {
+        setIsPlaying(false);
+        isTransitioningRef.current = false;
+      });
     } else {
-      audioRef.current.play()
-        .then(() => setIsPlaying(true))
-        .catch(err => console.log('Playback error:', err));
+      fadeIn(volume, 800);
     }
   };
 
