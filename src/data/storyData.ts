@@ -50,6 +50,7 @@ export const SONGS: Record<number, SongTrack> = {
     startTime: 0,
     chapterId: 3,
   },
+  // Song 4 is EXCLUSIVELY for the Love Letter Modal!
   4: {
     id: 'song-4',
     title: 'La Que Me Gusta A Mí',
@@ -66,7 +67,7 @@ export const CHAPTERS: Chapter[] = [
     title: "El Comienzo (2023)",
     subtitle: "21 de Julio de 2023",
     period: "2023 — 2024",
-    song: SONGS[1],
+    song: SONGS[1], // I Want to Hold Your Hand
     coverImage: "/recursos/IMG-20240427-WA0000.jpg",
     items: [
       { id: "m-101", type: "image", url: "/recursos/IMG-20240427-WA0000.jpg", date: "27 de Abril, 2024", chapterId: 1 },
@@ -81,7 +82,7 @@ export const CHAPTERS: Chapter[] = [
     title: "Aventuras (2024)",
     subtitle: "2024",
     period: "2024",
-    song: SONGS[2],
+    song: SONGS[2], // Dinamite
     coverImage: "/recursos/20240924_212107.jpg",
     items: [
       { id: "m-201", type: "image", url: "/recursos/20240924_212107.jpg", date: "24 de Septiembre, 2024", chapterId: 2 },
@@ -95,7 +96,7 @@ export const CHAPTERS: Chapter[] = [
     title: "Paso a Paso (2025)",
     subtitle: "2025 — 2026",
     period: "2025 — 2026",
-    song: SONGS[3],
+    song: SONGS[3], // Super Estrella
     coverImage: "/recursos/20250721_214126.jpg",
     items: [
       { id: "m-301", type: "image", url: "/recursos/20250313_105948.jpg", date: "13 de Marzo, 2025", chapterId: 3 },
@@ -121,7 +122,7 @@ export const CHAPTERS: Chapter[] = [
     title: "3 Años Juntos (2026)",
     subtitle: "21 de Julio de 2026",
     period: "2026",
-    song: SONGS[4],
+    song: SONGS[3], // Rotates back to Super Estrella (saving "La que me gusta a mi" strictly for the letter!)
     coverImage: "/recursos/IMG-20260714-WA0005.jpg",
     items: [
       { id: "m-401", type: "image", url: "/recursos/20260501_230353.jpg", date: "1 de Mayo, 2026", chapterId: 4 },

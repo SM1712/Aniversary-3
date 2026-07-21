@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CHAPTERS, MediaItem } from '../data/storyData';
-import { Shuffle, Sparkles, Check, Smartphone, Monitor, Heart } from 'lucide-react';
+import { Shuffle, Sparkles, Check, Smartphone, Monitor, Heart, Layers } from 'lucide-react';
 
 export type ShapeMode = 'number3' | 'heart' | 'polaroid' | 'grid';
 export type DeviceFormat = 'mobile' | 'desktop';
@@ -15,7 +15,7 @@ export const WallpaperGenerator: React.FC = () => {
 
   const shufflePhotos = () => {
     const shuffled = [...allImages].sort(() => Math.random() - 0.5);
-    setSelectedPhotos(shuffled.slice(0, 16));
+    setSelectedPhotos(shuffled.slice(0, 18));
   };
 
   useEffect(() => {
@@ -27,6 +27,30 @@ export const WallpaperGenerator: React.FC = () => {
     setTimeout(() => setApplied(false), 2000);
   };
 
+  // Grid coordinates defining a true Number "3" shape (5 columns x 6 rows)
+  const number3Grid = [
+    // Top bar of 3
+    { r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 2 }, { r: 0, c: 3 },
+    // Top right drop
+    { r: 1, c: 3 },
+    // Middle bar of 3
+    { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 },
+    // Bottom right drop
+    { r: 3, c: 3 },
+    { r: 4, c: 3 },
+    // Bottom bar of 3
+    { r: 5, c: 0 }, { r: 5, c: 1 }, { r: 5, c: 2 }, { r: 5, c: 3 },
+  ];
+
+  // Grid coordinates defining a Heart shape (5 columns x 6 rows)
+  const heartGrid = [
+    { r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 3 }, { r: 0, c: 4 },
+    { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 },
+    { r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 },
+    { r: 3, c: 1 }, { r: 3, c: 2 }, { r: 3, c: 3 },
+    { r: 4, c: 2 },
+  ];
+
   return (
     <div className="w-full max-w-4xl mx-auto py-8">
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-ink-900/10 shadow-sm text-center">
@@ -36,11 +60,11 @@ export const WallpaperGenerator: React.FC = () => {
         </div>
 
         <p className="text-xs text-ink-500 font-light mb-6">
-          Collage en forma de 3, corazón o libre, optimizado para teléfono móvil y pantalla.
+          Collage en forma del número 3 o corazón, optimizado para teléfono móvil (9:16) y pantalla.
         </p>
 
-        {/* Device Format Switcher (Celular 9:16 vs Desktop) */}
-        <div className="flex items-center justify-center gap-2 mb-4">
+        {/* Device Format Switcher */}
+        <div className="flex items-center justify-center gap-2 mb-5">
           <button
             onClick={() => setDeviceFormat('mobile')}
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all border ${
@@ -68,121 +92,118 @@ export const WallpaperGenerator: React.FC = () => {
 
         {/* Live Wallpaper Frame Container */}
         <div
-          className={`relative mx-auto rounded-3xl overflow-hidden shadow-2xl mb-6 border border-ink-900/15 bg-stone-950 flex items-center justify-center transition-all duration-500 ${
+          className={`relative mx-auto rounded-3xl overflow-hidden shadow-2xl mb-6 border border-ink-900/20 bg-stone-950 flex flex-col justify-between p-4 sm:p-6 transition-all duration-500 ${
             deviceFormat === 'mobile'
-              ? 'w-[280px] sm:w-[320px] aspect-[9/16]'
+              ? 'w-[300px] sm:w-[340px] aspect-[9/16]'
               : 'w-full aspect-[16/9]'
           }`}
         >
-          {/* Subtle Background */}
+          {/* Ambient Background Gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-stone-900 to-stone-950 opacity-95" />
 
-          {/* MODE 1: FORMA N°3 (NUMBER 3 COLLAGE SHAPE) */}
+          {/* REAL NUMBER 3 SHAPE MATRIX */}
           {shape === 'number3' && (
-            <div className="relative inset-0 w-full h-full p-4 flex flex-col justify-between items-center z-10">
-              {/* Top Arc of 3 */}
-              <div className="flex justify-center gap-1.5 w-full">
-                {selectedPhotos.slice(0, 3).map((photo, i) => (
-                  <div key={photo.id + i} className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shadow-md border border-white/20 rotate-[-3deg]">
-                    <img src={photo.url} alt="recuerdo" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
+            <div className="relative z-10 w-full h-full flex flex-col justify-center items-center">
+              <div className="grid grid-cols-4 gap-1.5 w-full max-w-[260px] sm:max-w-[300px] mx-auto py-2">
+                {Array.from({ length: 24 }).map((_, slotIndex) => {
+                  const r = Math.floor(slotIndex / 4);
+                  const c = slotIndex % 4;
+                  const isPart = number3Grid.some(cell => cell.r === r && cell.c === c);
+                  const photoIndex = number3Grid.findIndex(cell => cell.r === r && cell.c === c);
 
-              {/* Middle Bar of 3 */}
-              <div className="flex justify-end gap-1.5 w-3/4 self-end pr-4">
-                {selectedPhotos.slice(3, 5).map((photo, i) => (
-                  <div key={photo.id + i} className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-md border border-white/20 rotate-[4deg]">
-                    <img src={photo.url} alt="recuerdo" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
+                  if (!isPart) {
+                    return <div key={slotIndex} className="w-full aspect-square opacity-0 pointer-events-none" />;
+                  }
 
-              {/* Bottom Arc of 3 */}
-              <div className="flex justify-center gap-1.5 w-full">
-                {selectedPhotos.slice(5, 8).map((photo, i) => (
-                  <div key={photo.id + i} className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shadow-md border border-white/20 rotate-[-2deg]">
-                    <img src={photo.url} alt="recuerdo" className="w-full h-full object-cover" />
-                  </div>
-                ))}
+                  const photo = selectedPhotos[photoIndex % selectedPhotos.length];
+
+                  return (
+                    <div
+                      key={slotIndex}
+                      className="w-full aspect-square rounded-xl overflow-hidden shadow-md border border-white/20 hover:scale-105 transition-transform"
+                    >
+                      {photo && (
+                        <img
+                          src={photo.url}
+                          alt="3 shape"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
-          {/* MODE 2: HEART SHAPE */}
+          {/* REAL HEART SHAPE MATRIX */}
           {shape === 'heart' && (
-            <div className="relative inset-0 w-full h-full p-4 flex flex-col items-center justify-center z-10">
-              {/* Top row of heart (2 lobes) */}
-              <div className="flex justify-center gap-3 mb-2">
-                <div className="flex gap-1">
-                  {selectedPhotos.slice(0, 2).map((photo, i) => (
-                    <div key={photo.id + i} className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-white/30">
-                      <img src={photo.url} alt="heart" className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-1">
-                  {selectedPhotos.slice(2, 4).map((photo, i) => (
-                    <div key={photo.id + i} className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-white/30">
-                      <img src={photo.url} alt="heart" className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="relative z-10 w-full h-full flex flex-col justify-center items-center">
+              <div className="grid grid-cols-5 gap-1.5 w-full max-w-[260px] sm:max-w-[300px] mx-auto py-2">
+                {Array.from({ length: 25 }).map((_, slotIndex) => {
+                  const r = Math.floor(slotIndex / 5);
+                  const c = slotIndex % 5;
+                  const isPart = heartGrid.some(cell => cell.r === r && cell.c === c);
+                  const photoIndex = heartGrid.findIndex(cell => cell.r === r && cell.c === c);
 
-              {/* Middle row of heart */}
-              <div className="flex justify-center gap-1 mb-2">
-                {selectedPhotos.slice(4, 8).map((photo, i) => (
-                  <div key={photo.id + i} className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden border border-white/30">
-                    <img src={photo.url} alt="heart" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
+                  if (!isPart) {
+                    return <div key={slotIndex} className="w-full aspect-square opacity-0 pointer-events-none" />;
+                  }
 
-              {/* Bottom tip of heart */}
-              <div className="flex justify-center gap-1">
-                {selectedPhotos.slice(8, 10).map((photo, i) => (
-                  <div key={photo.id + i} className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border border-white/30">
-                    <img src={photo.url} alt="heart" className="w-full h-full object-cover" />
-                  </div>
-                ))}
+                  const photo = selectedPhotos[photoIndex % selectedPhotos.length];
+
+                  return (
+                    <div
+                      key={slotIndex}
+                      className="w-full aspect-square rounded-xl overflow-hidden shadow-md border border-white/20 hover:scale-105 transition-transform"
+                    >
+                      {photo && (
+                        <img
+                          src={photo.url}
+                          alt="heart shape"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
-          {/* MODE 3: POLAROIDS LIBRES */}
+          {/* POLAROID LIBRES */}
           {shape === 'polaroid' && (
-            <div className="relative inset-0 w-full h-full p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 items-center justify-center z-10 overflow-hidden">
-              {selectedPhotos.slice(0, 6).map((photo, index) => {
-                const rotation = (index % 2 === 0 ? -4 : 4);
+            <div className="relative z-10 w-full h-full p-2 grid grid-cols-3 gap-2 items-center justify-center overflow-hidden">
+              {selectedPhotos.slice(0, 9).map((photo, index) => {
+                const rotation = (index % 3 === 0 ? -4 : index % 2 === 0 ? 3 : -2);
                 return (
                   <div
                     key={photo.id + index}
                     style={{ transform: `rotate(${rotation}deg)` }}
-                    className="bg-white p-1.5 pb-4 rounded-lg shadow-xl"
+                    className="bg-white p-1 pb-3 rounded-lg shadow-xl"
                   >
-                    <img src={photo.url} alt="recuerdo" className="w-full aspect-square object-cover rounded" />
+                    <img src={photo.url} alt="polaroid" className="w-full aspect-square object-cover rounded" />
                   </div>
                 );
               })}
             </div>
           )}
 
-          {/* MODE 4: GRID LIMPIA */}
+          {/* MOSAICO GRID */}
           {shape === 'grid' && (
-            <div className="relative inset-0 w-full h-full p-2 grid grid-cols-3 gap-1.5 z-10 opacity-90">
+            <div className="relative z-10 w-full h-full p-1.5 grid grid-cols-3 gap-1.5 opacity-90">
               {selectedPhotos.slice(0, 9).map((photo, index) => (
-                <div key={photo.id + index} className="w-full h-full rounded-lg overflow-hidden border border-white/20">
+                <div key={photo.id + index} className="w-full h-full rounded-xl overflow-hidden border border-white/20">
                   <img src={photo.url} alt="grid" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
           )}
 
-          {/* Minimalist Floating Overlay Typography (Non-blocking, elegant) */}
-          <div className="absolute bottom-5 inset-x-4 z-20 text-center pointer-events-none">
-            <div className="inline-block bg-black/65 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-white shadow-2xl">
-              <span className="font-serif font-bold text-sm sm:text-base tracking-wide block">
+          {/* Minimal Integrated Badge Overlay */}
+          <div className="relative z-20 text-center pt-2">
+            <div className="inline-block bg-black/70 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-white shadow-xl">
+              <span className="font-serif font-semibold text-xs sm:text-sm tracking-wide block">
                 Feliz Aniversario N°3
               </span>
               <span className="text-[10px] text-stone-300 font-mono block">
@@ -192,7 +213,7 @@ export const WallpaperGenerator: React.FC = () => {
           </div>
         </div>
 
-        {/* Controls Bar */}
+        {/* Shape Selection Controls */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
           <button
             onClick={() => setShape('number3')}
@@ -202,7 +223,7 @@ export const WallpaperGenerator: React.FC = () => {
                 : 'bg-cream-50 text-ink-700 hover:bg-cream-100 border-ink-900/10'
             }`}
           >
-            Forma N°3
+            Forma N°3 Real
           </button>
 
           <button
@@ -257,7 +278,7 @@ export const WallpaperGenerator: React.FC = () => {
           {applied ? (
             <>
               <Check className="w-4 h-4 text-emerald-400" />
-              <span>¡Configuración de Fondo Guardada!</span>
+              <span>¡Fondo Guardado!</span>
             </>
           ) : (
             <>
