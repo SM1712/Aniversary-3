@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CHAPTERS, MediaItem } from '../data/storyData';
-import { Shuffle, Sparkles, Check, Smartphone, Monitor, Heart } from 'lucide-react';
+import { Shuffle, Sparkles, Check, Smartphone, Monitor, Heart, Download, Loader2 } from 'lucide-react';
 
 export type ShapeMode = 'number3' | 'heart' | 'polaroid' | 'grid';
 export type DeviceFormat = 'mobile' | 'desktop';
@@ -11,7 +11,8 @@ export const WallpaperGenerator: React.FC = () => {
   const [shape, setShape] = useState<ShapeMode>('number3');
   const [deviceFormat, setDeviceFormat] = useState<DeviceFormat>('mobile');
   const [selectedPhotos, setSelectedPhotos] = useState<MediaItem[]>([]);
-  const [applied, setApplied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
 
   const shufflePhotos = () => {
     const shuffled = [...allImages].sort(() => Math.random() - 0.5);
@@ -22,12 +23,7 @@ export const WallpaperGenerator: React.FC = () => {
     shufflePhotos();
   }, []);
 
-  const handleApplyToPage = () => {
-    setApplied(true);
-    setTimeout(() => setApplied(false), 2000);
-  };
-
-  // Grid coordinates defining a true Number "3" shape
+  // Grid coordinates defining a true Number "3" shape (4 columns x 6 rows)
   const number3Grid = [
     { r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 2 }, { r: 0, c: 3 },
     { r: 1, c: 3 },
@@ -46,6 +42,120 @@ export const WallpaperGenerator: React.FC = () => {
     { r: 4, c: 2 },
   ];
 
+  // HD PNG Export Generator
+  const downloadHDPng = async () => {
+    setDownloading(true);
+
+    try {
+      const canvas = document.createElement('canvas');
+      const isMobile = deviceFormat === 'mobile';
+
+      // 1080x1920 Full HD Mobile format, or 1920x1080 Desktop
+      canvas.width = isMobile ? 1080 : 1920;
+      canvas.height = isMobile ? 1920 : 1080;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Dark background fill
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, '#0c0a09');
+      grad.addColorStop(0.5, '#1c1917');
+      grad.addColorStop(1, '#0c0a09');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Load all selected photo images into HTML Image elements
+      const loadedImages = await Promise.all(
+        selectedPhotos.map(
+          (photo) =>
+            new Promise<HTMLImageElement>((resolve) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => resolve(img);
+              img.onerror = () => resolve(img);
+              img.src = photo.url;
+            })
+        )
+      );
+
+      // Draw grid shapes onto HD Canvas
+      const cols = shape === 'heart' ? 5 : 4;
+      const rows = 6;
+      const marginX = isMobile ? 120 : (canvas.width - 700) / 2;
+      const startY = isMobile ? 320 : 120;
+      const cellWidth = (canvas.width - marginX * 2) / cols;
+      const cellSize = cellWidth - 16;
+
+      const gridMatrix = shape === 'heart' ? heartGrid : number3Grid;
+
+      gridMatrix.forEach((cell, idx) => {
+        const img = loadedImages[idx % loadedImages.length];
+        if (!img || !img.complete || img.naturalWidth === 0) return;
+
+        const x = marginX + cell.c * cellWidth + 8;
+        const y = startY + cell.r * cellWidth + 8;
+
+        ctx.save();
+        // Draw rounded rectangle clip
+        ctx.beginPath();
+        const r = 24;
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + cellSize, y, x + cellSize, y + cellSize, r);
+        ctx.arcTo(x + cellSize, y + cellSize, x, y + cellSize, r);
+        ctx.arcTo(x, y + cellSize, x, y, r);
+        ctx.arcTo(x, y, x + cellSize, y, r);
+        ctx.closePath();
+        ctx.clip();
+
+        // Object cover image fit
+        const scale = Math.max(cellSize / img.naturalWidth, cellSize / img.naturalHeight);
+        const nw = img.naturalWidth * scale;
+        const nh = img.naturalHeight * scale;
+        const nx = x + (cellSize - nw) / 2;
+        const ny = y + (cellSize - nh) / 2;
+
+        ctx.drawImage(img, nx, ny, nw, nh);
+        ctx.restore();
+
+        // Subtle white border around each photo card
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      });
+
+      // Draw Pure Floating Typography Overlay at bottom
+      const textY = isMobile ? canvas.height - 220 : canvas.height - 100;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.font = 'bold 54px Georgia, serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowBlur = 12;
+      ctx.fillText('Feliz Aniversario N°3', canvas.width / 2, textY);
+
+      ctx.font = '28px monospace';
+      ctx.fillStyle = '#d6d3d1';
+      ctx.shadowBlur = 8;
+      ctx.fillText('21 de Julio de 2023 — 2026', canvas.width / 2, textY + 60);
+
+      // Export to high-res PNG download
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
+      const link = document.createElement('a');
+      link.download = `Aniversario-N3-Fondo-${deviceFormat}.png`;
+      link.href = dataUrl;
+      link.click();
+
+      setDownloaded(true);
+      setTimeout(() => setDownloaded(false), 2500);
+    } catch (err) {
+      console.log('Error exporting PNG:', err);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto py-8">
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-ink-900/10 shadow-sm text-center">
@@ -55,7 +165,7 @@ export const WallpaperGenerator: React.FC = () => {
         </div>
 
         <p className="text-xs text-ink-500 font-light mb-6">
-          Collage en forma del número 3 o corazón, optimizado para teléfono móvil (9:16) y pantalla.
+          Collage en forma del número 3 o corazón. Puedes descargarlo en formato PNG HD para tu celular o pantalla.
         </p>
 
         {/* Device Format Switcher */}
@@ -194,7 +304,7 @@ export const WallpaperGenerator: React.FC = () => {
             </div>
           )}
 
-          {/* PURE FLOATING TYPOGRAPHY (No box, no capsule, no borders) */}
+          {/* PURE FLOATING TYPOGRAPHY */}
           <div className="relative z-20 text-center pt-2 pointer-events-none drop-shadow-lg">
             <h3 className="font-serif font-semibold text-sm sm:text-base text-white tracking-wide block">
               Feliz Aniversario N°3
@@ -262,20 +372,26 @@ export const WallpaperGenerator: React.FC = () => {
           </button>
         </div>
 
-        {/* Apply Button */}
+        {/* HD PNG Download Button */}
         <button
-          onClick={handleApplyToPage}
-          className="px-6 py-2.5 rounded-full bg-ink-900 hover:bg-ink-800 text-white font-medium text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer"
+          onClick={downloadHDPng}
+          disabled={downloading}
+          className="px-6 py-3 rounded-full bg-ink-900 hover:bg-ink-800 text-white font-medium text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer disabled:opacity-50"
         >
-          {applied ? (
+          {downloading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Generando PNG en HD...</span>
+            </>
+          ) : downloaded ? (
             <>
               <Check className="w-4 h-4 text-emerald-400" />
-              <span>¡Fondo Guardado!</span>
+              <span>¡Fondo Descargado en Máxima Calidad!</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4" />
-              <span>Guardar Fondo de Pantalla</span>
+              <Download className="w-4 h-4" />
+              <span>Descargar Fondo PNG en HD</span>
             </>
           )}
         </button>
